@@ -45,7 +45,8 @@ and you should now have a local server running on port 8080. Open Google Chrome 
 
     }
 
-</script>```
+</script>
+```
 
 This shader program determines what gets outputted onto your screen. Let's break it down. 
 
@@ -76,7 +77,8 @@ Where (0., 0., 0., 1.) is black and (1., 1., 1., 1.) is white. These are just RG
 I should also mention that vectors can take in other vectors in their constructors. You can do stuff like this:
 
 ```vec4 my_vec_4 = vec4(vec3(0., 0., 0.), 1.);
-and the value of my_vec_4 will be (0., 0., 0., 1.).```
+and the value of my_vec_4 will be (0., 0., 0., 1.).
+```
 
 Finally, we should look at the variables at the top of the program. What are uniforms? Floats?
 
@@ -90,7 +92,8 @@ Anyway, variables that you pass from the CPU to the GPU are called uniforms. Aft
 
 ```uniform int my_integer;
 uniform vec3 my_vector3;
-uniform int my_array_of_integers[16];```
+uniform int my_array_of_integers[16];
+```
 
 So our uniforms are:
 
