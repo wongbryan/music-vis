@@ -31,7 +31,8 @@ and you should now have a local server running on port 8080. Open Google Chrome 
 
 4. Now we can start working on the actual scene. Open up index.html in your favorite text editor (most of you probably have Sublime) and take a look around. Most of the code is stuff I set up for you and you don't have to worry about it. What we're going to be working with is this portion of code:
 
-```<script type="fsh" id="fragmentShader">
+```
+<script type="fsh" id="fragmentShader">
     
     uniform float time;
     uniform float freqData[16];
@@ -77,8 +78,8 @@ Where (0., 0., 0., 1.) is black and (1., 1., 1., 1.) is white. These are just RG
 I should also mention that vectors can take in other vectors in their constructors. You can do stuff like this:
 
 ```vec4 my_vec_4 = vec4(vec3(0., 0., 0.), 1.);
-and the value of my_vec_4 will be (0., 0., 0., 1.).
 ```
+and the value of my_vec_4 will be (0., 0., 0., 1.).
 
 Finally, we should look at the variables at the top of the program. What are uniforms? Floats?
 
