@@ -77,8 +77,8 @@ Where (0., 0., 0., 1.) is black and (1., 1., 1., 1.) is white. These are just RG
 
 I should also mention that vectors can take in other vectors in their constructors. You can do stuff like this:
 
-```vec4 my_vec_4 = vec4(vec3(0., 0., 0.), 1.);
-```
+`vec4 my_vec_4 = vec4(vec3(0., 0., 0.), 1.);`
+
 and the value of my_vec_4 will be (0., 0., 0., 1.).
 
 Finally, we should look at the variables at the top of the program. What are uniforms? Floats?
