@@ -102,9 +102,10 @@ A floating point value for time, a floating point value for the current volume o
 
 The frequency data is an array of 16 floating point values, ranging from 0 to 255. Each entry of the array represents how loud a certain range of sound frequency is in the song. I think(?) the first couple entries represent how loud high notes are, and the last few entries represent how loud the low notes are. So you can do stuff like this:
 
-`float volume_of_high_pitched_sound = freqData[0];
+```float volume_of_high_pitched_sound = freqData[0];
 
-float volume_of_bass = freqData[15];`
+float volume_of_bass = freqData[15];
+```
 
 And use it however you want in the shader. KEEP IN MIND THAT THESE VALUES VARY FROM 0 TO 255, and RGBA values vary from 0 to 1. So you have to divide frequency values by 255 before using them as color, or whatever. 
 
