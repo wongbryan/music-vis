@@ -10,10 +10,11 @@ This will take you through how to start your part of the project.
 
 The output should be all the files in the current folder. It should include:
 
-`index.html
+```index.html
 bower_components
 README.md
-assets`
+assets
+```
 
 2. Make your own branch. Each person will be making their own scene. Thus, we're gonna be working on separate branches (look up Git branches to get an idea of what branches are and how they work). To make a branch, run:
 
