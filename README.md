@@ -21,7 +21,15 @@ git checkout -b your_name_here
 
 Git "checkout" is a command that lets you look at other people's branches. The flag -b specifies that you're creating a new branch, and then checking it out. 
 
-3. Now we can start working on the actual scene. Open up index.html in your favorite text editor (most of you probably have Sublime) and take a look around. Most of the code is stuff I set up for you and you don't have to worry about it. What we're going to be working with is this portion of code:
+3. Set up a dev server. Run the command:
+
+http-server
+
+and you should now have a local server running on port 8080. Open Google Chrome and go to
+
+localhost:8080
+
+4. Now we can start working on the actual scene. Open up index.html in your favorite text editor (most of you probably have Sublime) and take a look around. Most of the code is stuff I set up for you and you don't have to worry about it. What we're going to be working with is this portion of code:
 
 <script type="fsh" id="fragmentShader">
     
