@@ -1,6 +1,6 @@
-#Music Vis With Shaders
+# Music Vis With Shaders
 
-##Dev instructions
+## Dev instructions
 
 This will take you through how to start your part of the project.
 
@@ -31,7 +31,7 @@ localhost:8080
 
 4. Now we can start working on the actual scene. Open up index.html in your favorite text editor (most of you probably have Sublime) and take a look around. Most of the code is stuff I set up for you and you don't have to worry about it. What we're going to be working with is this portion of code:
 
-<script type="fsh" id="fragmentShader">
+`<script type="fsh" id="fragmentShader">
     
     uniform float time;
     uniform float freqData[16];
@@ -45,7 +45,7 @@ localhost:8080
 
     }
 
-</script>
+</script>`
 
 This shader program determines what gets outputted onto your screen. Let's break it down. 
 
