@@ -6,28 +6,28 @@ This will take you through how to start your part of the project.
 
 1. Open up terminal and change directory (cd) into the folder you have this project saved in. If you type in 
 
-ls
+`ls`
 
 The output should be all the files in the current folder. It should include:
 
-index.html
+`index.html
 bower_components
 README.md
-assets
+assets`
 
 2. Make your own branch. Each person will be making their own scene. Thus, we're gonna be working on separate branches (look up Git branches to get an idea of what branches are and how they work). To make a branch, run:
 
-git checkout -b your_name_here
+`git checkout -b your_name_here`
 
 Git "checkout" is a command that lets you look at other people's branches. The flag -b specifies that you're creating a new branch, and then checking it out. 
 
 3. Set up a dev server. Run the command:
 
-http-server
+`http-server`
 
 and you should now have a local server running on port 8080. Open Google Chrome and go to
 
-localhost:8080
+`localhost:8080`
 
 4. Now we can start working on the actual scene. Open up index.html in your favorite text editor (most of you probably have Sublime) and take a look around. Most of the code is stuff I set up for you and you don't have to worry about it. What we're going to be working with is this portion of code:
 
@@ -90,7 +90,9 @@ But this is because we're assigning the values to the variables on the CPU, in J
 Anyway, variables that you pass from the CPU to the GPU are called uniforms. After declaring a variable as a uniform, you specify its type (just like in C++). You can do stuff like this:
 
 `uniform int my_integer;
+
 uniform vec3 my_vector3;
+
 uniform int my_array_of_integers[16];`
 
 So our uniforms are:
@@ -100,6 +102,7 @@ A floating point value for time, a floating point value for the current volume o
 The frequency data is an array of 16 floating point values, ranging from 0 to 255. Each entry of the array represents how loud a certain range of sound frequency is in the song. I think(?) the first couple entries represent how loud high notes are, and the last few entries represent how loud the low notes are. So you can do stuff like this:
 
 `float volume_of_high_pitched_sound = freqData[0];
+
 float volume_of_bass = freqData[15];`
 
 And use it however you want in the shader. KEEP IN MIND THAT THESE VALUES VARY FROM 0 TO 255, and RGBA values vary from 0 to 1. So you have to divide frequency values by 255 before using them as color, or whatever. 
