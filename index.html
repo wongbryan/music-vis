@@ -8,6 +8,7 @@
     body{
         margin: 0;
         overflow: hidden;
+        background-color: black;
     }
 
     #loading, #start{
@@ -24,7 +25,6 @@
     #start{
         z-index: 1000;
         opacity: 1;
-        background: rgba(0, 0, 0, .3);
         transition: all .5s ;
     }
 
@@ -75,6 +75,7 @@
         color: white;
         bottom: 0;
         right: 0;
+        z-index: 3;
     }
 
     #play:hover{
@@ -84,6 +85,13 @@
     a{
         text-decoration: underline;
         color: white;
+    }
+
+    #container{
+        position:absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 </style>
 <body>
@@ -116,6 +124,7 @@ precision mediump float;
     uniform float time;
     uniform float freqData[16];
     uniform float volume;
+<<<<<<< HEAD
     uniform vec2 u_resolution;
     uniform vec3 u_mouse;
     uniform float u_time;
@@ -128,6 +137,21 @@ precision mediump float;
         // vec2 st = gl_FragCoord.st/u_resolution;
         // gl_FragColor = vec4(volume/st.x,st.y,0.75,1.0);
  
+=======
+    uniform vec2 resolution;
+
+    void main(){
+
+        vec2 st = gl_FragCoord.xy/resolution.xy;
+        st = st-1.;
+
+        vec2 center = vec2(0., 0.);
+        float radius = .25;
+        float distance = distance(st, center);
+        float inCircle = step(distance, radius);
+        
+        gl_FragColor = vec4(inCircle, 0., 0., 1.);
+>>>>>>> c5cea4786d294fc04bd09d7296e464a35b6a37ca
 
     }
 
@@ -137,39 +161,49 @@ precision mediump float;
 	var camera, scene, renderer, mesh;
     var playing, listener, sound, audioLoader, analyser;
 
+
 	function resize(){
-		camera.aspect = window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
-		renderer.setSize( window.innerWidth, window.innerHeight );
+
 	}
 
 	function init() {
+
+        // width = 500, height = 500;
+
 		container = document.getElementById( 'container' );
         camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
         scene = new THREE.Scene();
 
         var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
 
+        renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio( window.devicePixelRatio );
+        container.appendChild( renderer.domElement );
+
+        // var size = (window.innerWidth > window.innerHeight) ? window.innerWidth : window.innerHeight;
+        var size = 500;
+        renderer.setSize( size, size ) ;
+
+        var resolution = new THREE.Vector2();
+        resolution.x = size;
+        resolution.y = size;
+
         uniforms = {
             time: { value: 0 },
             freqData: { value: null },
             volume: { value: null },
+            resolution: {value: resolution}
         };
 
         var material = new THREE.ShaderMaterial( {
             uniforms: uniforms,
+            transparent: true,
             vertexShader: document.getElementById( 'vertexShader' ).textContent,
             fragmentShader: document.getElementById( 'fragmentShader' ).textContent
         } );
 
         mesh = new THREE.Mesh( geometry, material );
         scene.add( mesh );
-
-        renderer = new THREE.WebGLRenderer();
-        renderer.setPixelRatio( window.devicePixelRatio );
-        container.appendChild( renderer.domElement );
-        
-        renderer.setSize( window.innerWidth, window.innerHeight );
 
         window.addEventListener( 'resize', resize, false );
 	}
