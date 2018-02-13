@@ -1,0 +1,39 @@
+// Author:
+2
+// Title:
+3
+​
+4
+#ifdef GL_ES
+5
+precision mediump float;
+6
+#endif
+7
+​
+8
+uniform vec2 u_resolution;
+9
+uniform vec2 u_mouse;
+10
+uniform float u_time;
+11
+​
+12
+void main() {
+13
+   vec2 st = gl_FragCoord.xy/u_resolution.xy;
+14
+    float radius = 0.25;
+15
+    vec2 center = vec2(0.5, 0.5);
+16
+    float dist = distance(center, st);
+17
+    float step = step(radius, dist);
+18
+    gl_FragColor = vec4(0., step, 0., 1.);
+19
+    
+20
+}
