@@ -125,12 +125,16 @@
         vec2 st = gl_FragCoord.xy/resolution.xy;
         st = st-1.;
 
-        vec2 center = vec2(0., 0.);
-        float radius = .25;
+        vec2 center = vec2(0., 0.);  
         float distance = distance(st, center);
-        float inCircle = step(distance, radius);
+        float a = atan(st.x, st.y) + 4.*sin(time);
+        float f = cos(a*12.)*sin(a*8.)*volume + .25;
+        float inFunction = smoothstep(distance, distance + .2, f);
+
+        vec3 color = vec3(1.) - distance*vec3(3.,2.,1.);
         
-        gl_FragColor = vec4(inCircle, 0., 0., 1.);
+        //gl_FragColor = vec4(f * color, 1.);
+        gl_FragColor = vec4(color * inFunction, 1.);
 
     }
 
