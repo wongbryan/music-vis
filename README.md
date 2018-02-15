@@ -44,7 +44,6 @@ and you should now have a local server running on port 8080. Open Google Chrome 
         vec3 color = vec3(volume, 0., 0.);
         float opacity = 1.;
         gl_FragColor = vec4(color, opacity);
-
     }
 
 </script>
