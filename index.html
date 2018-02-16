@@ -8,6 +8,7 @@
     body{
         margin: 0;
         overflow: hidden;
+        background-color: black;
     }
 
     #loading, #start{
@@ -24,7 +25,6 @@
     #start{
         z-index: 1000;
         opacity: 1;
-        background: rgba(0, 0, 0, .3);
         transition: all .5s ;
     }
 
@@ -75,6 +75,7 @@
         color: white;
         bottom: 0;
         right: 0;
+        z-index: 3;
     }
 
     #play:hover{
@@ -84,6 +85,13 @@
     a{
         text-decoration: underline;
         color: white;
+    }
+
+    #container{
+        position:absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
     }
 </style>
 <body>
@@ -106,6 +114,13 @@
 
 </script>
 <script type="fsh" id="fragmentShader">
+
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+
+    #define PI 3.14159265359
+    #define TWO_PI 6.28318530718
     
     //uniform float time;
     //uniform float freqData[16];
@@ -128,13 +143,11 @@
         //float opacity = 1.;
         //gl_FragColor = vec4(color, opacity);
 
-
         vec2 st = gl_FragCoord.xy/resolution.xy;
         st.x *= resolution.x/resolution.y;
         vec3 color = vec3(0.0, 0.0, 0.0);
         float d = 0.0;
-    
-        st = st * 2.;
+        st = st/2. - .5;
     
         int N = 5;
     
@@ -153,39 +166,49 @@
 	var camera, scene, renderer, mesh;
     var playing, listener, sound, audioLoader, analyser;
 
+
 	function resize(){
-		camera.aspect = window.innerWidth / window.innerHeight;
-		camera.updateProjectionMatrix();
-		renderer.setSize( window.innerWidth, window.innerHeight );
+
 	}
 
 	function init() {
+
+        // width = 500, height = 500;
+
 		container = document.getElementById( 'container' );
         camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
         scene = new THREE.Scene();
 
         var geometry = new THREE.PlaneBufferGeometry( 2, 2 );
 
+        renderer = new THREE.WebGLRenderer();
+        renderer.setPixelRatio( window.devicePixelRatio );
+        container.appendChild( renderer.domElement );
+
+        // var size = (window.innerWidth > window.innerHeight) ? window.innerWidth : window.innerHeight;
+        var size = 500;
+        renderer.setSize( size, size ) ;
+
+        var resolution = new THREE.Vector2();
+        resolution.x = size;
+        resolution.y = size;
+
         uniforms = {
             time: { value: 0 },
             freqData: { value: null },
             volume: { value: null },
+            resolution: {value: resolution}
         };
 
         var material = new THREE.ShaderMaterial( {
             uniforms: uniforms,
+            transparent: true,
             vertexShader: document.getElementById( 'vertexShader' ).textContent,
             fragmentShader: document.getElementById( 'fragmentShader' ).textContent
         } );
 
         mesh = new THREE.Mesh( geometry, material );
         scene.add( mesh );
-
-        renderer = new THREE.WebGLRenderer();
-        renderer.setPixelRatio( window.devicePixelRatio );
-        container.appendChild( renderer.domElement );
-        
-        renderer.setSize( window.innerWidth, window.innerHeight );
 
         window.addEventListener( 'resize', resize, false );
 	}
