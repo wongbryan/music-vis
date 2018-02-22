@@ -115,30 +115,7 @@
 </script>
 <script type="fsh" id="fragmentShader">
 
-    #ifdef GL_ES
-precision mediump float;
-#endif
-
-#define PROCESSING_COLOR_SHADER
-    
-    uniform float time;
-    uniform float freqData[16];
-    uniform float volume;
-<<<<<<< HEAD
-    uniform vec2 u_resolution;
-    uniform vec3 u_mouse;
-    uniform float u_time;
-
-    void main(){
-
-        vec3 color = vec3(volume/1.2, 0.338, 0.39);
-        float opacity = 0.8;
-        gl_FragColor = vec4(color, opacity);
-        // vec2 st = gl_FragCoord.st/u_resolution;
-        // gl_FragColor = vec4(volume/st.x,st.y,0.75,1.0);
- 
-=======
-    #ifdef GL_ES
+#ifdef GL_ES
 precision mediump float;
 #endif
 
