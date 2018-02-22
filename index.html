@@ -162,7 +162,7 @@
 
         float f = (2.0 * volume) * (cos(24. * a) + sin(16. * a));
 
-        vec3 color = vec3(1., sin(time), cos(time)) * vec3(noise(st) + 1., noise(st) + 1., noise(st) + 1.) * vec3(1.0 * volume, 0.5 * volume, 2.0 * volume) * vec3(1. - smoothstep(f, f + 0.02, r));
+        vec3 color = vec3(1., sin(time * 2.), cos(time)) * vec3(noise(st) + 1., noise(st) + 1., noise(st) + 1.) * vec3(1.0 * volume, 0.5 * volume, 2.0 * volume) * vec3(1. - smoothstep(f, f + 0.02, r));
         
         gl_FragColor = vec4(color, 1.);
 
