@@ -170,14 +170,7 @@ void main() {
     float a = atan(pos.y+n-.15, pos.x+n-.15)/volume*.5;
     float f = (cos(a*3.));
     f = abs(cos(a*3.));
-   // f = abs(cos(a*2.5))*.5+.3;
     f = abs(cos(a*12.)*sin(a*3.))*(.8)*.1;
-    //  if(f > radius){
-    //     gl_FragColor = vec4(0.609,1.000,0.673,1.000);
-    // }
-    // else{
-    //     gl_FragColor = vec4(0.0, .0, 0.0, 1.0);
-    // }
     color += color/(volume+0.1)*.1;
     color += vec3((volume+0.3)*.3-smoothstep(f, f+0.02, radius));
     float opacity = 1.0;
