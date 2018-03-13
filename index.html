@@ -612,7 +612,7 @@ float noise (in vec2 st) {
     });
 
     var whichSong = 0;
-    var songs = ['assets/rockstar.mp3', 'assets/midnightcity.mp3', 'assets/hydrate.mp3', 'assets/tobucandyland.mp3', 'assets/ajrcomehangout.mp3'];
+    var songs = ['assets/rockstar.mp3', 'assets/midnightcity.mp3', '/assets/mgmtkids.mp3', 'assets/tobucandyland.mp3', 'assets/hydrate.mp3', 'assets/madeonbeings.mp3', 'assets/ajrcomehangout.mp3'];
     var noSongChange = true;
     function toggleSong() {
         sound.stop();
@@ -624,6 +624,8 @@ float noise (in vec2 st) {
             sound.play();
         });
         noSongChange = false;
+        playing = true;
+        document.getElementById('play').innerHTML = 'pause';
     }
 
     // create an AudioAnalyser, passing in the sound and desired fftSize
