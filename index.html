@@ -408,8 +408,7 @@ void main() {
             fragmentShader: document.getElementById( 'fragmentShaderAlex' ).textContent
         } );
         var materials = [materialAlex, materialEmmy, materialMichelle, materialYoshino, materialKristie];
-        const NUMBER_OF_MATERIALS = 5;
-        var index = Math.floor(mesh.material.uniforms['time'].value) % NUMBER_OF_MATERIALS;
+        var index = Math.floor(mesh.material.uniforms['time'].value) % materials.length;
         mesh.material = materials[index];
         
         mesh.material.uniforms['time'].value += .005;
