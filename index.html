@@ -171,18 +171,158 @@
     }
 
 </script>
-<script type="fsh" id="fragmentShaderTest">
+<script type="fsh" id="fragmentShaderYoshino">
+    #ifdef GL_ES
+    precision highp float;
+    #endif
+    #define PI 3.14159265359
+    #define TWO_PI 6.28318530718
+    
+    //uniform float time;
+    //uniform float freqData[16];
+    //uniform float volume;
+    #ifdef GL_ES
+    precision mediump float;
+    #endif
+    #define PI 3.14159265359
+    #define TWOPI 6.28318530718
+    uniform vec2 resolution;
+    //uniform vec2 u_mouse;
+    uniform float time;
+    void main(){
+        //vec3 color = vec3(volume, 0.38, 0.76);
+        //float opacity = 1.;
+        //gl_FragColor = vec4(color, opacity);
+        vec2 st = gl_FragCoord.xy/resolution.xy;
+        st.x *= resolution.x/resolution.y;
+        vec3 color = vec3(0.0, 0.0, 0.0);
+        float d = 0.0;
+        st = st/2. - .5;
+    
+        int N = 5;
+    
+        float a = atan(st.x,st.y) + PI;
+        float r = TWOPI/float(N);
+    
+        d = cos(floor(0.5+a/r)*r-a)*length(st);
+    
+        color = vec3(1.0 - smoothstep(0.,0.5,d));
+    
+        gl_FragColor = vec4(color, 1.0);
+    }
+</script>
+<script type="fsh" id="fragmentShaderMichelle">
+#ifdef GL_ES
+precision mediump float;
+#endif
+uniform float time;
+uniform float freqdata[16];
+uniform float volume;
+uniform vec2 resolution;
+// 2D Random
+float random (in vec2 st) {
+    return fract(sin(dot(st.xy,
+                         vec2(12.9898,78.233)))
+                 * 43758.5453123);
+}
+// 2D Noise based on Morgan McGuire @morgan3d
+// https://www.shadertoy.com/view/4dS3Wd
+float noise (in vec2 st) {
+    vec2 i = floor(st);
+    vec2 f = fract(st);
+    // Four corners in 2D of a tile
+    float a = random(i);
+    float b = random(i + vec2(1.0, 0.0));
+    float c = random(i + vec2(0.0, 1.0));
+    float d = random(i + vec2(1.0, 1.0));
+    // Smooth Interpolation
+    // Cubic Hermine Curve.  Same as SmoothStep()
+    vec2 u = f*f*(3.0-2.0*f);
+    // u = smoothstep(0.,1.,f);
+    // Mix 4 coorners porcentages
+    return mix(a, b, u.x) +
+            (c - a)* u.y * (1.0 - u.x) +
+            (d - b) * u.x * u.y;
+}
+void main() {
+   vec2 st = gl_FragCoord.xy/resolution.xy;
+   st -= 0.5;
+   st *= 2.;
+   st = fract(st);
+    vec3 color = vec3(0.259, 0.182, 0.78);
+    vec2 pos = vec2(0.)-st;
+    float radius = length(pos)*0.07/volume;
+    float n = noise(st);
+    float a = atan(pos.y+n-.15, pos.x+n-.15)/volume*.5;
+    float f = (cos(a*3.));
+    f = abs(cos(a*3.));
+    f = abs(cos(a*12.)*sin(a*3.))*(.8)*.1;
+    color += color/(volume+0.1)*.1;
+    color += vec3((volume+0.3)*.3-smoothstep(f, f+0.02, radius));
+    float opacity = 1.0;
+    gl_FragColor = vec4(color, opacity);
+   
+}
+</script>
+<script type="fsh" id="fragmentShaderEmmy">
     
     uniform float time;
     uniform float freqData[16];
     uniform float volume;
     uniform vec2 resolution;
-
     void main(){
-        vec3 color = vec3(0.2,0.4,0.5);
+        vec2 st = gl_FragCoord.xy/resolution.xy;
+        st = st-1.;
+        vec2 center = vec2(0., 0.);
+        float radius = .25;
+        float distance = distance(st, center);
+        float inCircle = step(distance, radius);
+        
+        gl_FragColor = vec4(inCircle, 0., 0., 1.);
+    }
+</script>
+<script type="fsh" id="fragmentShaderAlex">
+    
+    uniform float time;
+    uniform float freqData[16];
+    uniform float volume;
+    uniform vec2 resolution;
+    // 2D Random
+    float random (in vec2 st) {
+        return fract(sin(dot(st.xy,
+                             vec2(12.9898,78.233)))
+                     * 43758.5453123);
+    }
+    // 2D Noise based on Morgan McGuire @morgan3d
+    // https://www.shadertoy.com/view/4dS3Wd
+    float noise (in vec2 st) {
+        vec2 i = floor(st);
+        vec2 f = fract(st);
+        // Four corners in 2D of a tile
+        float a = random(i);
+        float b = random(i + vec2(1.0, 0.0));
+        float c = random(i + vec2(0.0, 1.0));
+        float d = random(i + vec2(1.0, 1.0));
+        // Smooth Interpolation
+        // Cubic Hermine Curve.  Same as SmoothStep()
+        vec2 u = f*f*(3.0-2.0*f);
+        // u = smoothstep(0.,1.,f);
+        // Mix 4 coorners porcentages
+        return mix(a, b, u.x) +
+                (c - a)* u.y * (1.0 - u.x) +
+                (d - b) * u.x * u.y;
+    }
+    void main() {
+        vec2 st = gl_FragCoord.xy/resolution.xy;
+        st = st-1.;
+        float n = noise(st);
+        float r = length(st) * 2.0;
+        float a = atan(st.y, st.x) + (2.0 * sin(time+n));
+        float f = (2.0 * volume) * (cos(24. * a) + sin(16. * a));
+        vec3 color = vec3(1., sin(time * 2.), cos(time)) * vec3(noise(st) + 1., noise(st) + 1., noise(st) + 1.) * vec3(1.0 * volume, 0.5 * volume, 2.0 * volume) * vec3(1. - smoothstep(f, f + 0.02, r));
+        
         gl_FragColor = vec4(color, 1.);
     }
-
 </script>
 <script src="bower_components/three.js/build/three.js"></script>
 <script>
@@ -227,7 +367,7 @@
             uniforms: uniforms,
             transparent: true,
             vertexShader: document.getElementById( 'vertexShader' ).textContent,
-            fragmentShader: document.getElementById( 'fragmentShaderTest' ).textContent
+            fragmentShader: document.getElementById( 'fragmentShaderKristie' ).textContent
         } );
 
         mesh = new THREE.Mesh( geometry, material );
@@ -237,21 +377,38 @@
 	}
 
 	function update(){
-        
-        var materialTest = new THREE.ShaderMaterial( {
-            uniforms: uniforms,
-            transparent: true,
-            vertexShader: document.getElementById( 'vertexShader' ).textContent,
-            fragmentShader: document.getElementById( 'fragmentShaderTest' ).textContent
-        } );
         var materialKristie = new THREE.ShaderMaterial( {
             uniforms: uniforms,
             transparent: true,
             vertexShader: document.getElementById( 'vertexShader' ).textContent,
             fragmentShader: document.getElementById( 'fragmentShaderKristie' ).textContent
         } );
-        var materials = [materialTest, materialKristie];
-        const NUMBER_OF_MATERIALS = 2;
+        var materialYoshino = new THREE.ShaderMaterial( {
+            uniforms: uniforms,
+            transparent: true,
+            vertexShader: document.getElementById( 'vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'fragmentShaderYoshino' ).textContent
+        } );
+        var materialMichelle = new THREE.ShaderMaterial( {
+            uniforms: uniforms,
+            transparent: true,
+            vertexShader: document.getElementById( 'vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'fragmentShaderMichelle' ).textContent
+        } );
+        var materialEmmy = new THREE.ShaderMaterial( {
+            uniforms: uniforms,
+            transparent: true,
+            vertexShader: document.getElementById( 'vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'fragmentShaderEmmy' ).textContent
+        } );
+        var materialAlex = new THREE.ShaderMaterial( {
+            uniforms: uniforms,
+            transparent: true,
+            vertexShader: document.getElementById( 'vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'fragmentShaderAlex' ).textContent
+        } );
+        var materials = [materialAlex, materialEmmy, materialMichelle, materialYoshino, materialKristie];
+        const NUMBER_OF_MATERIALS = 5;
         var index = Math.floor(mesh.material.uniforms['time'].value) % NUMBER_OF_MATERIALS;
         mesh.material = materials[index];
         
