@@ -113,6 +113,75 @@
     }
 
 </script>
+<script type="fsh" id="fragmentShaderBryan">
+
+    uniform float time;
+    uniform float volume;
+    uniform vec2 resolution;
+    uniform mat4 freqData[16];
+
+    vec2 random2( vec2 p ) {
+        return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
+    }
+
+    void main(){
+
+        vec2 st = gl_FragCoord.xy/resolution.xy;
+        st = st-1.;
+
+        st *= 2.;
+        // st *= (2. - 1.5*volume);
+
+        vec2 i_st = floor(st);
+        vec2 f_st = fract(st);
+
+        vec3 color = vec3(1.);
+
+        float m_dist = .1 + .9 * volume;  // minimun distance
+
+        for (int y= -1; y <= 1; y++) {
+            for (int x= -1; x <= 1; x++) {
+                // Neighbor place in the grid
+                vec2 neighbor = vec2(float(x),float(y));
+
+                // Random position from current + neighbor place in the grid
+                vec2 point = random2(i_st + neighbor);
+
+                float vol = volume * 2. - 1.;
+                // Animate the point
+                point = vec2(.5 * vol * .25 * random2(st).x, .5 * vol * .25 * random2(st).y) + vec2(.5*sin(time + 6.2831*point));
+
+                // Vector between the pixel and the point
+                vec2 diff = neighbor + point + f_st;
+
+                // Distance to the point
+                float dist = volume * length(diff);
+
+                // Keep the closer distance
+                m_dist = min(m_dist, dist);
+            }
+        }
+        
+        // color = vec3(1.) - distance*vec3(3.,2.,1.);
+        
+        //gl_FragColor = vec4(f * color, 1.);
+        // gl_FragColor = vec4(color * inFunction, 1.);
+
+        color = volume * vec3(f_st.x, i_st.y, freqData[1] / 255.);
+
+        // Draw the min distance (distance field)
+        color -= m_dist;
+
+        // Draw cell center
+        color += 1.-step(.02, m_dist);
+
+        // Show isolines
+        // color -= step(.7,abs(sin(27.0*m_dist)))*.5;
+
+        gl_FragColor = vec4(color, 1.0);
+    }
+
+</script>
 <script type="fsh" id="fragmentShaderKristie">
     
     uniform float time;
@@ -476,7 +545,13 @@ float noise (in vec2 st) {
             vertexShader: document.getElementById( 'vertexShader' ).textContent,
             fragmentShader: document.getElementById( 'fragmentShaderAlex' ).textContent
         } );
-        var materials = [materialYoshino, materialEmmy, materialMichelle, materialKristie, materialAlex];
+        var materialBryan = new THREE.ShaderMaterial( {
+            uniforms: uniforms,
+            transparent: true,
+            vertexShader: document.getElementById( 'vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'fragmentShaderBryan' ).textContent
+        } );
+        var materials = [materialYoshino, materialEmmy, materialMichelle, materialKristie, materialAlex, materialBryan];
     
         if (playing)
             mesh.material.uniforms['time'].value += .005;
