@@ -189,6 +189,8 @@
     uniform vec2 resolution;
     //uniform vec2 u_mouse;
     uniform float time;
+    uniform float freqData[16];
+    uniform float volume;
     void main(){
         //vec3 color = vec3(volume, 0.38, 0.76);
         //float opacity = 1.;
@@ -197,14 +199,21 @@
         st.x *= resolution.x/resolution.y;
         vec3 color = vec3(0.0, 0.0, 0.0);
         float d = 0.0;
-        st = st/2. - .5;
+
+// new stuff
+        st *= 2.;
+   st = fract(st);
+
+        st = st/2. - .25;
+
+        
     
         int N = 5;
     
         float a = atan(st.x,st.y) + PI;
         float r = TWOPI/float(N);
     
-        d = cos(floor(0.5+a/r)*r-a)*length(st);
+        d = cos(floor(0.5+a/r)*r-a)*length(st)*8.0*volume;
     
         color = vec3(1.0 - smoothstep(0.,0.5,d));
     
@@ -413,7 +422,7 @@ void main() {
             vertexShader: document.getElementById( 'vertexShader' ).textContent,
             fragmentShader: document.getElementById( 'fragmentShaderAlex' ).textContent
         } );
-        var materials = [materialAlex, materialEmmy, materialMichelle, materialYoshino, materialKristie];
+        var materials = [materialAlex, materialYoshino, materialMichelle, materialEmmy, materialKristie];
     
         if (playing)
             mesh.material.uniforms['time'].value += .005;
