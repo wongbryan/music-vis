@@ -82,6 +82,21 @@
         cursor: pointer;
     }
 
+    #song{
+        font-family: Helvetica;
+        font-size: 1em;
+        position: absolute;
+        margin: 25px;
+        color: white;
+        bottom: 0;
+        left: 0;
+        z-index: 3;
+    }
+
+    #song:hover{
+        cursor: pointer;
+    }
+
     a{
         text-decoration: underline;
         color: white;
@@ -103,6 +118,7 @@
     </div>
 	<div id="container"></div>
     <div id="play" onclick="toggleplay()">play</div>
+    <div id="song" onclick="toggleSong()">another song</div>
 </body>
 <script type="vsh" id="vertexShader">
     
@@ -456,6 +472,55 @@ float noise (in vec2 st) {
         gl_FragColor = vec4(color, 1.);
     }
 </script>
+<script type="fsh" id="fragmentShaderBryan">
+    uniform float time;
+    uniform float volume;
+    uniform vec2 resolution;
+    uniform mat4 freqData[16];
+    vec2 random2( vec2 p ) {
+        return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
+    }
+    void main(){
+        vec2 st = gl_FragCoord.xy/resolution.xy;
+        st = st-1.;
+        st *= 2.;
+        // st *= (2. - 1.5*volume);
+        vec2 i_st = floor(st);
+        vec2 f_st = fract(st);
+        vec3 color = vec3(1.);
+        float m_dist = .1 + .9 * volume;  // minimun distance
+        for (int y= -1; y <= 1; y++) {
+            for (int x= -1; x <= 1; x++) {
+                // Neighbor place in the grid
+                vec2 neighbor = vec2(float(x),float(y));
+                // Random position from current + neighbor place in the grid
+                vec2 point = random2(i_st + neighbor);
+                float vol = volume * 2. - 1.;
+                // Animate the point
+                point = vec2(.5 * vol * .25 * random2(st).x, .5 * vol * .25 * random2(st).y) + vec2(.5*sin(time + 6.2831*point));
+                // Vector between the pixel and the point
+                vec2 diff = neighbor + point + f_st;
+                // Distance to the point
+                float dist = volume * length(diff);
+                // Keep the closer distance
+                m_dist = min(m_dist, dist);
+            }
+        }
+        
+        // color = vec3(1.) - distance*vec3(3.,2.,1.);
+        
+        //gl_FragColor = vec4(f * color, 1.);
+        // gl_FragColor = vec4(color * inFunction, 1.);
+        color = volume * vec3(f_st.x, i_st.y, freqData[1] / 255.);
+        // Draw the min distance (distance field)
+        color -= m_dist;
+        // Draw cell center
+        color += 1.-step(.02, m_dist);
+        // Show isolines
+        // color -= step(.7,abs(sin(27.0*m_dist)))*.5;
+        gl_FragColor = vec4(color, 1.0);
+    }
+</script>
 <script type="fsh" id="fragmentShaderPause">
     void main() {
         gl_FragColor = vec4(0.,0.,0., 1.);
@@ -566,6 +631,7 @@ float noise (in vec2 st) {
         }
 
         volume = volume/freqData.length;
+
         // if volume is greater than previous volume by threshold amount, switch materials
         if (volume - previousVolume > (previousVolume*0.25)) {
             whoseTurn = (whoseTurn + 1) % materials.length;
@@ -614,12 +680,32 @@ float noise (in vec2 st) {
         sound.setRefDistance( 20 );
     });
 
+    var whichSong = 0;
+    var songs = ['assets/rockstar.mp3', 'assets/midnightcity.mp3', '/assets/mgmtkids.mp3', 'assets/tobucandyland.mp3', 'assets/hydrate.mp3', 'assets/madeonbeings.mp3', 'assets/ajrcomehangout.mp3'];
+    var noSongChange = true;
+    function toggleSong() {
+        sound.stop();
+        whichSong = (whichSong + 1) % songs.length;
+        audioLoader.load( songs[whichSong], function( buffer ) {
+            sound.setBuffer( buffer );
+            sound.setVolume(0.7);
+            sound.setRefDistance( 20 );
+            sound.play();
+        });
+        noSongChange = false;
+        playing = true;
+        document.getElementById('play').innerHTML = 'pause';
+    }
+
     // create an AudioAnalyser, passing in the sound and desired fftSize
     analyser = new THREE.AudioAnalyser( sound, 32 );
 
     THREE.DefaultLoadingManager.onLoad = function(){
         document.getElementById('loading').style.display = 'none';
-        init();
+
+        if (noSongChange)
+            init();
+
         animate();
 
         var b = document.getElementsByClassName('startButton')[0];
