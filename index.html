@@ -380,7 +380,8 @@ void main() {
 
         window.addEventListener( 'resize', resize, false );
 	}
-
+    var previousVolume = 0;
+    var whoseTurn = 0;
 	function update(){
         var materialKristie = new THREE.ShaderMaterial( {
             uniforms: uniforms,
@@ -413,8 +414,6 @@ void main() {
             fragmentShader: document.getElementById( 'fragmentShaderAlex' ).textContent
         } );
         var materials = [materialAlex, materialEmmy, materialMichelle, materialYoshino, materialKristie];
-        var index = Math.floor(mesh.material.uniforms['time'].value) % materials.length;
-        mesh.material = materials[index];
     
         if (playing)
             mesh.material.uniforms['time'].value += .005;
@@ -429,6 +428,15 @@ void main() {
         }
 
         volume = volume/freqData.length;
+
+        // if volume is greater than previous volume by threshold amount, switch materials
+        if (volume - previousVolume > 30) {
+            console.log('switch! ' + (volume - previousVolume));
+            whoseTurn = (whoseTurn + 1) % materials.length;
+            mesh.material = materials[whoseTurn];
+        }
+        previousVolume = volume;
+
         mesh.material.uniforms['volume'].value = volume/256;
 	}
 
