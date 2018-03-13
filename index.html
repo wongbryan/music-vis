@@ -237,13 +237,24 @@
 	}
 
 	function update(){
+        
+        var materialTest = new THREE.ShaderMaterial( {
+            uniforms: uniforms,
+            transparent: true,
+            vertexShader: document.getElementById( 'vertexShader' ).textContent,
+            fragmentShader: document.getElementById( 'fragmentShaderTest' ).textContent
+        } );
         var materialKristie = new THREE.ShaderMaterial( {
             uniforms: uniforms,
             transparent: true,
             vertexShader: document.getElementById( 'vertexShader' ).textContent,
             fragmentShader: document.getElementById( 'fragmentShaderKristie' ).textContent
         } );
-        mesh.material = materialKristie;
+        var materials = [materialTest, materialKristie];
+        const NUMBER_OF_MATERIALS = 2;
+        var index = Math.floor(mesh.material.uniforms['time'].value) % NUMBER_OF_MATERIALS;
+        mesh.material = materials[index];
+        
         mesh.material.uniforms['time'].value += .005;
 
         var freqDataInt = analyser.getFrequencyData();
