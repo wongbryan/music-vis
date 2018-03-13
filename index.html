@@ -115,55 +115,13 @@
 </script>
 <script type="fsh" id="fragmentShader">
 
-    #ifdef GL_ES
-    precision highp float;
-    #endif
-
-    #define PI 3.14159265359
-    #define TWO_PI 6.28318530718
-    
     uniform float time;
-    uniform float freqData[16];
     uniform float volume;
     uniform vec2 resolution;
+    uniform mat4 freqData[16];
 
-        // 2D Random
-    float random (in vec2 st) {
-        return fract(sin(dot(st.xy,
-                             vec2(12.9898,78.233)))
-                     * 43758.5453123);
-    }
-
-    // 2D Noise based on Morgan McGuire @morgan3d
-    // https://www.shadertoy.com/view/4dS3Wd
-    float noise (in vec2 st) {
-        vec2 i = floor(st);
-        vec2 f = fract(st);
-
-        // Four corners in 2D of a tile
-        float a = random(i);
-        float b = random(i + vec2(1.0, 0.0));
-        float c = random(i + vec2(0.0, 1.0));
-        float d = random(i + vec2(1.0, 1.0));
-
-        // Smooth Interpolation
-
-        // Cubic Hermine Curve.  Same as SmoothStep()
-        vec2 u = f*f*(3.0-2.0*f);
-        // u = smoothstep(0.,1.,f);
-
-        // Mix 4 coorners porcentages
-        return mix(a, b, u.x) +
-                (c - a)* u.y * (1.0 - u.x) +
-                (d - b) * u.x * u.y;
-    }
-
-    float box(vec2 _st, vec2 _size, float _smoothEdges){
-        _size = vec2(0.5, .5)-_size*0.5;
-        vec2 aa = vec2(_smoothEdges*0.2);
-        vec2 uv = smoothstep(_size,_size+aa,_st);
-        uv *= smoothstep(_size,_size+aa,vec2(1.0)-_st);
-        return uv.x*uv.y;
+    vec2 random2( vec2 p ) {
+        return fract(sin(vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3))))*43758.5453);
     }
 
     void main(){
@@ -171,16 +129,50 @@
         vec2 st = gl_FragCoord.xy/resolution.xy;
         st = st-1.;
 
-        vec2 center = vec2(0., 0.);  
-        float distance = distance(st, center);
-        float a = atan(st.x, st.y) + 4.*sin(time);
-        float f = cos(a*12.)*sin(a*8.)*volume + .25;
-        float inFunction = smoothstep(distance, distance + .2, f);
-        
-        vec3 color = vec3(1.) - distance*vec3(3.,2.,1.);
-        
-        //gl_FragColor = vec4(f * color, 1.);
-        gl_FragColor = vec4(color * inFunction, 1.);
+        st *= (2. - .5*volume);
+
+        vec2 i_st = floor(st);
+        vec2 f_st = fract(st);
+
+        vec3 color = vec3(1.);
+
+        float m_dist = .1 + .9 * volume;  // minimun distance
+
+        for (int y= -1; y <= 1; y++) {
+            for (int x= -1; x <= 1; x++) {
+                // Neighbor place in the grid
+                vec2 neighbor = vec2(float(x),float(y));
+
+                // Random position from current + neighbor place in the grid
+                vec2 point = random2(i_st + neighbor);
+
+                float vol = volume * 2. - 1.;
+                // Animate the point
+                point = vec2(.5 * vol * .25 * random2(st).x, .5 * vol * .25 * random2(st).y) + vec2(.5*sin(time + 6.2831*point));
+
+                // Vector between the pixel and the point
+                vec2 diff = neighbor + point + f_st;
+
+                // Distance to the point
+                float dist = volume * length(diff);
+
+                // Keep the closer distance
+                m_dist = min(m_dist, dist);
+            }
+        }
+
+        color = volume * vec3(f_st.x, i_st.y, freqData[1] / 255.);
+
+        // Draw the min distance (distance field)
+        color -= m_dist;
+
+        // Draw cell center
+        color += 1.-step(.02, m_dist);
+
+        // Show isolines
+        color -= step(.7,abs(sin(27.0*m_dist)))*.5;
+
+        gl_FragColor = vec4(color,1.0);
     }
 
 </script>
