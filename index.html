@@ -324,6 +324,11 @@ void main() {
         gl_FragColor = vec4(color, 1.);
     }
 </script>
+<script type="fsh" id="fragmentShaderPause">
+    void main() {
+        gl_FragColor = vec4(0.,0.,0., 1.);
+    }
+</script>
 <script src="bower_components/three.js/build/three.js"></script>
 <script>
 	var camera, scene, renderer, mesh;
@@ -377,40 +382,50 @@ void main() {
 	}
 
 	function update(){
-        var materialKristie = new THREE.ShaderMaterial( {
+        if (playing) {
+            var materialKristie = new THREE.ShaderMaterial( {
+                    uniforms: uniforms,
+                    transparent: true,
+                    vertexShader: document.getElementById( 'vertexShader' ).textContent,
+                    fragmentShader: document.getElementById( 'fragmentShaderKristie' ).textContent
+                } );
+                var materialYoshino = new THREE.ShaderMaterial( {
+                    uniforms: uniforms,
+                    transparent: true,
+                    vertexShader: document.getElementById( 'vertexShader' ).textContent,
+                    fragmentShader: document.getElementById( 'fragmentShaderYoshino' ).textContent
+                } );
+                var materialMichelle = new THREE.ShaderMaterial( {
+                    uniforms: uniforms,
+                    transparent: true,
+                    vertexShader: document.getElementById( 'vertexShader' ).textContent,
+                    fragmentShader: document.getElementById( 'fragmentShaderMichelle' ).textContent
+                } );
+                var materialEmmy = new THREE.ShaderMaterial( {
+                    uniforms: uniforms,
+                    transparent: true,
+                    vertexShader: document.getElementById( 'vertexShader' ).textContent,
+                    fragmentShader: document.getElementById( 'fragmentShaderEmmy' ).textContent
+                } );
+                var materialAlex = new THREE.ShaderMaterial( {
+                    uniforms: uniforms,
+                    transparent: true,
+                    vertexShader: document.getElementById( 'vertexShader' ).textContent,
+                    fragmentShader: document.getElementById( 'fragmentShaderAlex' ).textContent
+                } );
+                var materials = [materialAlex, materialEmmy, materialMichelle, materialYoshino, materialKristie];
+                var index = Math.floor(mesh.material.uniforms['time'].value) % materials.length;
+                mesh.material = materials[index];
+            }
+        else {
+            var materialPause = new THREE.ShaderMaterial( {
             uniforms: uniforms,
             transparent: true,
             vertexShader: document.getElementById( 'vertexShader' ).textContent,
-            fragmentShader: document.getElementById( 'fragmentShaderKristie' ).textContent
-        } );
-        var materialYoshino = new THREE.ShaderMaterial( {
-            uniforms: uniforms,
-            transparent: true,
-            vertexShader: document.getElementById( 'vertexShader' ).textContent,
-            fragmentShader: document.getElementById( 'fragmentShaderYoshino' ).textContent
-        } );
-        var materialMichelle = new THREE.ShaderMaterial( {
-            uniforms: uniforms,
-            transparent: true,
-            vertexShader: document.getElementById( 'vertexShader' ).textContent,
-            fragmentShader: document.getElementById( 'fragmentShaderMichelle' ).textContent
-        } );
-        var materialEmmy = new THREE.ShaderMaterial( {
-            uniforms: uniforms,
-            transparent: true,
-            vertexShader: document.getElementById( 'vertexShader' ).textContent,
-            fragmentShader: document.getElementById( 'fragmentShaderEmmy' ).textContent
-        } );
-        var materialAlex = new THREE.ShaderMaterial( {
-            uniforms: uniforms,
-            transparent: true,
-            vertexShader: document.getElementById( 'vertexShader' ).textContent,
-            fragmentShader: document.getElementById( 'fragmentShaderAlex' ).textContent
-        } );
-        var materials = [materialAlex, materialEmmy, materialMichelle, materialYoshino, materialKristie];
-        var index = Math.floor(mesh.material.uniforms['time'].value) % materials.length;
-        mesh.material = materials[index];
-        
+            fragmentShader: document.getElementById( 'fragmentShaderPause' ).textContent
+            } );
+            mesh.material = materialPause;
+        }
         mesh.material.uniforms['time'].value += .005;
 
         var freqDataInt = analyser.getFrequencyData();
@@ -437,14 +452,11 @@ void main() {
     function toggleplay(){
 
         if(playing){
-
             sound.pause();
             playing = false;
             document.getElementById('play').innerHTML = 'play';
-
         }
         else{
-
             sound.play();
             playing = true;
             document.getElementById('play').innerHTML = 'pause';
