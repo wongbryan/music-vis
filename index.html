@@ -129,7 +129,8 @@
         vec2 st = gl_FragCoord.xy/resolution.xy;
         st = st-1.;
 
-        st *= (2. - .5*volume);
+        st *= 2.;
+        // st *= (2. - 1.5*volume);
 
         vec2 i_st = floor(st);
         vec2 f_st = fract(st);
@@ -160,15 +161,14 @@
                 m_dist = min(m_dist, dist);
             }
         }
+        
+        // color = vec3(1.) - distance*vec3(3.,2.,1.);
+        
+        //gl_FragColor = vec4(f * color, 1.);
+        // gl_FragColor = vec4(color * inFunction, 1.);
 
         color = volume * vec3(f_st.x, i_st.y, freqData[1] / 255.);
 
-        vec2 center = point;  
-        float distance = distance(st, center);
-        float a = atan(st.x, st.y) + 4.*sin(time);
-        float f = cos(a*12.)*sin(a*8.)*volume + .25;
-        float inFunction = smoothstep(distance, distance + .2, f);
-        
         // Draw the min distance (distance field)
         color -= m_dist;
 
@@ -176,9 +176,9 @@
         color += 1.-step(.02, m_dist);
 
         // Show isolines
-        color -= step(.7,abs(sin(27.0*m_dist)))*.5;
+        // color -= step(.7,abs(sin(27.0*m_dist)))*.5;
 
-        gl_FragColor = vec4(color,1.0);
+        gl_FragColor = vec4(color, 1.0);
     }
 
 </script>
