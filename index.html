@@ -435,7 +435,7 @@ float noise (in vec2 st) {
             uniforms: uniforms,
             transparent: true,
             vertexShader: document.getElementById( 'vertexShader' ).textContent,
-            fragmentShader: document.getElementById( 'fragmentShaderYoshino' ).textContent
+            fragmentShader: document.getElementById( 'fragmentShaderAlex' ).textContent
         } );
 
         mesh = new THREE.Mesh( geometry, material );
@@ -494,7 +494,7 @@ float noise (in vec2 st) {
         // if volume is greater than previous volume by threshold amount, switch materials
         if (volume - previousVolume > (previousVolume*0.25)) {
             whoseTurn = (whoseTurn + 1) % materials.length;
-            //mesh.material = materials[whoseTurn];
+            mesh.material = materials[whoseTurn];
         }
         previousVolume = volume;
 
