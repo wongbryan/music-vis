@@ -163,6 +163,12 @@
 
         color = volume * vec3(f_st.x, i_st.y, freqData[1] / 255.);
 
+        vec2 center = point;  
+        float distance = distance(st, center);
+        float a = atan(st.x, st.y) + 4.*sin(time);
+        float f = cos(a*12.)*sin(a*8.)*volume + .25;
+        float inFunction = smoothstep(distance, distance + .2, f);
+        
         // Draw the min distance (distance field)
         color -= m_dist;
 
