@@ -191,6 +191,31 @@
     uniform float time;
     uniform float freqData[16];
     uniform float volume;
+        // 2D Random
+float random (in vec2 st) {
+    return fract(sin(dot(st.xy,
+                         vec2(12.9898,78.233)))
+                 * 43758.5453123);
+}
+// 2D Noise based on Morgan McGuire @morgan3d
+// https://www.shadertoy.com/view/4dS3Wd
+float noise (in vec2 st) {
+    vec2 i = floor(st);
+    vec2 f = fract(st);
+    // Four corners in 2D of a tile
+    float a = random(i);
+    float b = random(i + vec2(1.0, 0.0));
+    float c = random(i + vec2(0.0, 1.0));
+    float d = random(i + vec2(1.0, 1.0));
+    // Smooth Interpolation
+    // Cubic Hermine Curve.  Same as SmoothStep()
+    vec2 u = f*f*(3.0-2.0*f);
+    // u = smoothstep(0.,1.,f);
+    // Mix 4 coorners porcentages
+    return mix(a, b, u.x) +
+            (c - a)* u.y * (1.0 - u.x) +
+            (d - b) * u.x * u.y;
+}
     void main(){
         //vec3 color = vec3(volume, 0.38, 0.76);
         //float opacity = 1.;
@@ -200,21 +225,20 @@
         vec3 color = vec3(0.0, 0.0, 0.0);
         float d = 0.0;
 
-// new stuff
+        // for tiling
         st *= 2.;
-   st = fract(st);
+        st = fract(st);
 
         st = st/2. - .25;
-
-        
-    
         int N = 5;
-    
+        float n = noise(vec2(volume,volume));
+
         float a = atan(st.x,st.y) + PI;
         float r = TWOPI/float(N);
     
-        d = cos(floor(0.5+a/r)*r-a)*length(st)*8.0*volume;
-    
+        //d = cos(floor(0.5+a/r)*r-a)*length(st)*8.0*volume;
+        //d = cos(floor(noise(st)+a/r)*r-a)*length(st)*8.0*volume;
+        d = cos(floor(n+a/r)*r-a)*length(st)*8.0*volume;
         color = vec3(1.0 - smoothstep(0.,0.5,d));
     
         gl_FragColor = vec4(color, 1.0);
@@ -307,26 +331,6 @@ float noise (in vec2 st) {
         float volume_of_bass = freqData[15]/255.;
         float volume_of_high_pitch = freqData[0]/255.;
         float volume_of_medium_pitch = freqData[7]/255.;
-         // vec3 color = vec3(volume, 0., 0.);
-      //   float opacity = 1.;
-      //   gl_FragColor = vec4(color, opacity);
-        // vec2 st = gl_FragCoord.xy/resolution.xy;
-        // st = st-1.;
-        // vec2 center = vec2(0., 0.);
-        // float radius = .25;
-        // float distance = distance(st, center);
-        // float inCircle = step(distance, radius);
-        
-        // gl_FragColor = vec4(inCircle, 0., 0., 1.);
-        
-        //square
-  //        vec2 st = gl_FragCoord.xy/resolution.xy;
-  //       st = st-0.5;
-  //       vec3 color = vec3(0., 0., 0.);
-  //       vec2 bl = step(vec2(0.1),st);   // bottom-left
-        // vec2 tr = step(vec2(0.1), 1.0-st);   // top-right
-        // color = vec3(bl.x * bl.y * tr.x * tr.y);
-  //       gl_FragColor = vec4(color, 1.0);
             vec2 st = gl_FragCoord.xy/resolution.xy;
             st = st - 0.5;
             // st = fract(st);
@@ -431,7 +435,7 @@ float noise (in vec2 st) {
             uniforms: uniforms,
             transparent: true,
             vertexShader: document.getElementById( 'vertexShader' ).textContent,
-            fragmentShader: document.getElementById( 'fragmentShaderAlex' ).textContent
+            fragmentShader: document.getElementById( 'fragmentShaderYoshino' ).textContent
         } );
 
         mesh = new THREE.Mesh( geometry, material );
@@ -487,12 +491,10 @@ float noise (in vec2 st) {
         }
 
         volume = volume/freqData.length;
-
         // if volume is greater than previous volume by threshold amount, switch materials
-        if (volume - previousVolume > 30) {
-            console.log('switch! ' + (volume - previousVolume));
+        if (volume - previousVolume > (previousVolume*0.25)) {
             whoseTurn = (whoseTurn + 1) % materials.length;
-            mesh.material = materials[whoseTurn];
+            //mesh.material = materials[whoseTurn];
         }
         previousVolume = volume;
 
