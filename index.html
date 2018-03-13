@@ -82,6 +82,21 @@
         cursor: pointer;
     }
 
+    #song{
+        font-family: Helvetica;
+        font-size: 1em;
+        position: absolute;
+        margin: 25px;
+        color: white;
+        bottom: 0;
+        left: 0;
+        z-index: 3;
+    }
+
+    #song:hover{
+        cursor: pointer;
+    }
+
     a{
         text-decoration: underline;
         color: white;
@@ -103,6 +118,7 @@
     </div>
 	<div id="container"></div>
     <div id="play" onclick="toggleplay()">play</div>
+    <div id="song" onclick="toggleSong()">another song</div>
 </body>
 <script type="vsh" id="vertexShader">
     
@@ -491,6 +507,7 @@ float noise (in vec2 st) {
         }
 
         volume = volume/freqData.length;
+
         // if volume is greater than previous volume by threshold amount, switch materials
         if (volume - previousVolume > (previousVolume*0.25)) {
             whoseTurn = (whoseTurn + 1) % materials.length;
@@ -539,12 +556,30 @@ float noise (in vec2 st) {
         sound.setRefDistance( 20 );
     });
 
+    var whichSong = 0;
+    var songs = ['assets/rockstar.mp3', 'assets/midnightcity.mp3', 'assets/hydrate.mp3', 'assets/tobucandyland.mp3', 'assets/ajrcomehangout.mp3'];
+    var noSongChange = true;
+    function toggleSong() {
+        sound.stop();
+        whichSong = (whichSong + 1) % songs.length;
+        audioLoader.load( songs[whichSong], function( buffer ) {
+            sound.setBuffer( buffer );
+            sound.setVolume(0.7);
+            sound.setRefDistance( 20 );
+            sound.play();
+        });
+        noSongChange = false;
+    }
+
     // create an AudioAnalyser, passing in the sound and desired fftSize
     analyser = new THREE.AudioAnalyser( sound, 32 );
 
     THREE.DefaultLoadingManager.onLoad = function(){
         document.getElementById('loading').style.display = 'none';
-        init();
+
+        if (noSongChange)
+            init();
+
         animate();
 
         var b = document.getElementsByClassName('startButton')[0];
